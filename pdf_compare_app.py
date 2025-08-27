@@ -1,10 +1,8 @@
 import streamlit as st
-import fitz  # PyMuPDF
+import fitz 
 from PIL import Image, ImageChops
 import io
 import hashlib
-
-# ------------------ Helper Functions ------------------
 
 def hash_pdf(file):
     file.seek(0)
@@ -18,7 +16,7 @@ def pdf_to_images(pdf_file, zoom=2):
     images = []
     for page_num in range(len(doc)):
         page = doc[page_num]
-        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom))  # higher resolution
+        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom)) 
         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
         images.append(img)
     return images
@@ -110,8 +108,6 @@ def add_styles():
     </style>
     """, unsafe_allow_html=True)
 
-# ------------------ Streamlit UI ------------------
-
 st.set_page_config(page_title="Advanced PDF Comparator", layout="wide")
 add_styles()
 
@@ -133,7 +129,6 @@ if pdf_file1 and pdf_file2:
     else:
         st.warning("Differences detected. Visual comparison below.")
 
-        # Convert both PDFs to images
         images1 = pdf_to_images(pdf_file1, zoom=2)
         images2 = pdf_to_images(pdf_file2, zoom=2)
 
