@@ -1,2 +1,148 @@
-# ADVANCED-PDF-COMPARATOR
-  This Python web app is designed to compare two PDF files and identify whether they are identical or not. It provides an efficient way to check documents without having to go through them manually. When the two PDFs are the same, the app confirms the match instantly. If they differ, it highlights the visual differences on a page by page basis. This makes it much easier to spot even small changes such as alignment issues, spacing, formatting adjustments or modified content. The app uses image rendering techniques to show variations between the files in a clear and user friendly way. Instead of searching line by line, users can visually see where the differences occur, saving both time and effort. It is especially useful for students, researchers or professionals who work with multiple versions of documents and need a reliable method to track changes. Overall, this tool ensures accuracy, clarity and convenience in PDF comparison.
+Here’s a **diagrammatic breakdown of the algorithms** and logic used in `pdf_compare_app.py`:
+
+---
+
+## 1. High-Level Flow
+
+```
+      ┌────────────┐
+      │   Start    │
+      └─────┬──────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Streamlit page setup &  │
+│ CSS styling             │
+└─────────┬───────────────┘
+          │
+          ▼
+┌─────────────────────────┐
+│ Upload PDF 1 & PDF 2    │
+└─────────┬───────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ If both PDFs are uploaded:  │
+└─────────┬───────────────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  Compute MD5 hash   │
+│  for both PDFs      │
+└─────────┬───────────┘
+          │
+          ▼
+┌────────────────────────────────────────────────────┐
+│ If hashes are equal:                               │
+│    └─> PDFs are IDENTICAL (show success message)   │
+│ Else:                                              │
+│    └─> Proceed to visual comparison                │
+└─────────┬──────────────────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────────────────────────────┐
+│ Convert each PDF to images (page by page)          │
+│ (using PyMuPDF and PIL)                            │
+└─────────┬──────────────────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────────────────────────────┐
+│ For each page (up to max pages in either PDF):     │
+│   - Display images from PDF1 and PDF2 side by side │
+│   - If a PDF is missing the page, show blank page  │
+└─────────┬──────────────────────────────────────────┘
+          │
+          ▼
+┌──────────────────────────┐
+│ Show "comparison complete"│
+└────────────┬─────────────┘
+             │
+             ▼
+        ┌────────┐
+        │  End   │
+        └────────┘
+```
+
+---
+
+## 2. Algorithmic Details
+
+### A. PDF Hashing (Deduplication)
+- **Algorithm:** MD5 Hash  
+- **Step:**  
+  - Read entire PDF file as bytes.
+  - Compute MD5 hash (`hashlib.md5`).
+  - Compare the hashes for both files.
+
+### B. PDF to Image Conversion
+- **Algorithm:**  
+  - For each page in PDF:
+    - Use PyMuPDF (`fitz`) to render page as a pixmap.
+    - Convert pixmap to a PIL image (`Image.frombytes`).
+  - Store all images in a list.
+
+### C. Page-by-Page Visual Comparison
+- **Algorithm:** For loop over max pages in either PDF.
+  - For each page index:
+    - If page exists in both PDFs: show both images.
+    - If page missing in one PDF: show a blank (white) image of proper size.
+  - Display both images side-by-side using Streamlit columns.
+
+### D. UI/Styling
+- **Algorithm:** Custom HTML/CSS injected into Streamlit for modern look.
+- Not an algorithm per se, but improves UX.
+
+---
+
+## 3. Visual Diagram of Core Processing (PDF Compare Logic)
+
+```
+        PDF1             PDF2
+         │                │
+         ▼                ▼
+   ┌───────────────┐ ┌───────────────┐
+   │ MD5 Hash Calc │ │ MD5 Hash Calc │
+   └───────┬───────┘ └───────┬───────┘
+           │                 │
+           └───────┬─────────┘
+                   ▼
+          ┌─────────────────┐
+          │ Hash Comparison │
+          └────────┬────────┘
+                   │
+          ┌────────┴─────────┐
+          │   If Equal?      │
+          └──────┬───────────┘
+                 │
+            Yes  │  No
+     ┌───────────┴───────────┐
+     │       Visual Compare  │
+     └───────────┬───────────┘
+                 ▼
+        ┌─────────────────────────────┐
+        │ For i in max(pages1, pages2)│
+        │   PDF1[i] vs PDF2[i]        │
+        │   (show blank if missing)   │
+        │   Show side-by-side         │
+        └─────────────────────────────┘
+```
+
+---
+
+## 4. Summary Table
+
+| Step                | Algorithm/Method         | Library       |
+|---------------------|-------------------------|--------------|
+| PDF Upload          | Streamlit file_uploader | Streamlit    |
+| Hashing             | MD5                     | hashlib      |
+| PDF to Image        | Rendering + Conversion  | fitz + PIL   |
+| Page Looping        | For loop, padding       | Python       |
+| UI/Display          | Columns, HTML/CSS       | Streamlit    |
+
+---
+
+**In essence:**  
+- The only "algorithmic" steps are the MD5 hashing for quick equality check and the image rendering from PDFs for manual visual comparison.  
+- The rest is logic for pairing images and rendering them in the UI.
+
+If you want a more formal flowchart or want to see pseudocode for each algorithm, let me know!
